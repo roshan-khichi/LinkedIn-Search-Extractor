@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LinkedIn Search Extractor</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo" aria-hidden="true">in</span>
+      <div>
+        <h1>Search Extractor</h1>
+        <p id="tabStatus" class="sub">Checking tab…</p>
+      </div>
+    </div>
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tabSearch" class="tab active" aria-selected="true">Search results</button>
+      <button role="tab" id="tabProfiles" class="tab" aria-selected="false">Profile lookup</button>
+    </div>
+  </header>
+
+  <!-- ============================ SEARCH PANEL ============================ -->
+  <div id="panelSearch">
+    <section>
+      <h2>What to extract</h2>
+      <div class="grid" id="fields">
+        <label class="chip"><input type="checkbox" data-field="first_name" checked><span>First name</span></label>
+        <label class="chip"><input type="checkbox" data-field="last_name" checked><span>Last name</span></label>
+        <label class="chip"><input type="checkbox" data-field="position" checked><span>Position</span></label>
+        <label class="chip"><input type="checkbox" data-field="skills" checked><span>Skills</span></label>
+        <label class="chip"><input type="checkbox" data-field="location" checked><span>Location</span></label>
+        <label class="chip"><input type="checkbox" data-field="profile_link" checked><span>Profile link</span></label>
+      </div>
+      <p class="hint">Hidden names appear as <code>LinkedIn</code> / <code>Member</code>. Skills are joined with commas.</p>
+    </section>
+
+    <section>
+      <h2>Pages</h2>
+      <label class="radio"><input type="radio" name="mode" value="all" checked><span>All pages <em id="detected"></em></span></label>
+      <label class="radio"><input type="radio" name="mode" value="range"><span>Page range</span></label>
+      <div id="rangeRow" class="range" hidden>
+        <label>From <input type="number" id="from" min="1" max="100" value="1"></label>
+        <label>to <input type="number" id="to" min="1" max="100" placeholder="last"></label>
+      </div>
+    </section>
+
+    <details>
+      <summary>Options</summary>
+      <div class="adv">
+        <label class="check"><input type="checkbox" id="skipHidden"><span>Skip profiles with hidden names (“LinkedIn Member”)</span></label>
+        <label class="check"><input type="checkbox" id="verify"><span>Verify each profile <b class="tag">slow</b></span></label>
+        <p class="hint">Opens every profile and checks that the first and last name match the search result. Adds a <b>Verified</b> column (Verified / Unverified), replaces the link with the public profile link, and clears the link if the profile is a 404.</p>
+        <label class="check"><input type="checkbox" id="deepSkills"><span>Deep skills scan <b class="tag">experimental</b></span></label>
+        <p class="hint warn">Search results rarely list skills. This opens each profile’s Skills page. Both options send many extra requests, which raises the risk of LinkedIn limiting your account.</p>
+      </div>
+    </details>
+
+    <div class="actions">
+      <button id="start" class="primary">Start extracting</button>
+      <button id="resume" class="primary" hidden>Resume</button>
+      <button id="stop" class="danger" hidden>Stop</button>
+    </div>
+
+    <section id="progress" hidden>
+      <div class="bar"><div id="barFill"></div></div>
+      <p id="progressText" class="sub strong"></p>
+      <p id="message" class="msg"></p>
+    </section>
+
+    <section id="results" hidden>
+      <h2>Results <span id="count" class="count">0</span></h2>
+      <div class="actions">
+        <button id="dlCsv">CSV</button>
+        <button id="dlJson">JSON</button>
+        <button id="copy">Copy</button>
+        <button id="clear" class="ghost">Clear</button>
+      </div>
+    </section>
+    <p id="zeroHint" class="hint warn" hidden>No results detected on this page yet. Scroll to the top, wait for the results to load, then reopen this popup. If it still says 0, press “Copy diagnostics” below.</p>
+  </div>
+
+  <!-- ============================ PROFILE PANEL =========================== -->
+  <div id="panelProfiles" hidden>
+    <section>
+      <h2>LinkedIn profiles</h2>
+      <textarea id="profileInput" rows="6" spellcheck="false" placeholder="https://www.linkedin.com/in/jane-doe/&#10;https://www.linkedin.com/in/john-smith/ | John Smith"></textarea>
+      <p class="hint">One profile per line. Add <code>| Name</code> after a link to also mark it Verified / Unverified against that name.</p>
+    </section>
+
+    <div class="actions">
+      <button id="pStart" class="primary">Extract profiles</button>
+      <button id="pStop" class="danger" hidden>Stop</button>
+    </div>
+
+    <section id="pProgress" hidden>
+      <div class="bar"><div id="pBarFill"></div></div>
+      <p id="pProgressText" class="sub strong"></p>
+      <p id="pMessage" class="msg"></p>
+    </section>
+
+    <section id="pResults" hidden>
+      <h2>Results <span id="pCount" class="count">0</span></h2>
+      <div class="tablewrap"><table id="pTable"></table></div>
+      <div class="actions">
+        <button id="pCsv">CSV</button>
+        <button id="pJson">JSON</button>
+        <button id="pCopy">Copy</button>
+        <button id="pClear" class="ghost">Clear</button>
+      </div>
+    </section>
+  </div>
+
+  <details class="speed">
+    <summary>Speed</summary>
+    <div class="adv">
+      <div class="range">
+        <label>Delay between requests <input type="number" id="delayMin" min="1.5" step="0.5" value="3"></label>
+        <label>– <input type="number" id="delayMax" min="2" step="0.5" value="6"> s</label>
+      </div>
+      <p class="hint">Keep some delay. Going fast is the quickest way to get an account restricted.</p>
+    </div>
+  </details>
+
+  <p id="error" class="error" hidden></p>
+  <footer>Runs only in your browser. Use responsibly and within LinkedIn’s terms.<br><button id="diag" class="link">Copy diagnostics</button></footer>
+  <script src="popup.js"></script>
+</body>
+</html>
