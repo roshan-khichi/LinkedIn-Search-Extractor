@@ -59,10 +59,15 @@ or click **Code → Download ZIP** on GitHub and unzip it.
 4. Select the folder that contains `manifest.json`.
 5. Pin the extension: click the puzzle-piece icon in the toolbar, then the pin next to **LinkedIn Search Extractor**.
 
-### GIF
-
 
 The same steps work in other Chromium browsers (Edge: `edge://extensions`, Brave: `brave://extensions`).
+
+
+### GIF
+
+<img width="2562" height="1394" alt="Load Extension" src="https://github.com/user-attachments/assets/fe7ca77a-b555-4e54-b6c1-c012b60779ae" />
+
+
 
 ### 3. Updating
 
